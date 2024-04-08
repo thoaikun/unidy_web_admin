@@ -1,4 +1,8 @@
 import HomeLayout from "@components/layout/homeLayout";
+import AccountsPage from "@pages/accounts";
+import AccountDetailPage from "@pages/accounts/[id]";
+import CampaignsPage from "@pages/campagins";
+import CampaignDetailPage from "@pages/campagins/[id]";
 import LoginPage from "@pages/login";
 import { createBrowserRouter } from "react-router-dom";
 
@@ -13,11 +17,19 @@ const router = createBrowserRouter([
         children: [
           {
             path: '/campaigns',
-            element: <div>Campaigns page</div>
+            element: <CampaignsPage />
           },
           {
-            path: '/contacts',
-            element: <div>Contacts page</div>
+            path: '/campaigns/:id',
+            element: <CampaignDetailPage />
+          },
+          {
+            path: '/accounts',
+            element: <AccountsPage />
+          },
+          {
+            path: '/accounts/:id',
+            element: <AccountDetailPage />
           }
         ]
     }

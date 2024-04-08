@@ -9,6 +9,7 @@ import { RouterProvider } from 'react-router-dom'
 import theme from './config/theme'
 import router from './router'
 
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
