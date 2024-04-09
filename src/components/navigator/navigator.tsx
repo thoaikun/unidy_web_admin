@@ -1,23 +1,17 @@
-import { AccountCircle, ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
+import { AccountCircle } from "@mui/icons-material";
 import CampaignIcon from '@mui/icons-material/Campaign';
-import { Box, Collapse, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
-import { useState } from "react";
 import ContactsIcon from '@mui/icons-material/Contacts';
-import { useNavigate } from "react-router-dom";
+import { Box, Collapse, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
+import api from "@services/base";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
-const Navigator = () => {
+const useSideBarNavigator = () => {
     const navigator = useNavigate()
-    const [extendDrawer, setExtendDrawer] = useState(false)
+    const location = useLocation()
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-
-    const handleToggleDrawer = () => {
-        setExtendDrawer(!extendDrawer)
-    }
-
-    const handleCloseDrawer = () => {
-        setExtendDrawer(false)
-    }
+    const [selectedIndex, setSelectedIndex] = useState(0)
 
     const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
         setMenuAnchorEl(event.currentTarget);
@@ -27,20 +21,58 @@ const Navigator = () => {
         setMenuAnchorEl(null);
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('session')
+        delete api.defaults.headers.common['Authorization']
+        navigator('/login')
+    }
+
+    useEffect(() => {
+        switch (location.pathname) {
+            case '/accounts':
+                setSelectedIndex(0)
+                break
+            case '/campaigns':
+                setSelectedIndex(1)
+                break
+            default:
+                setSelectedIndex(0)
+                break
+        }
+    }, [location.pathname])
+
+    return {
+        menuAnchorEl,
+        selectedIndex,
+        handleOpenMenu,
+        handleCloseMenu,
+        handleLogout,
+        navigator,
+    }
+}
+
+const Navigator = () => {
+    const {
+        menuAnchorEl, 
+        selectedIndex,
+        handleOpenMenu, 
+        handleCloseMenu, 
+        handleLogout,
+        navigator 
+    } = useSideBarNavigator()
+
     return (
         <Drawer 
             variant='permanent' 
-            open={extendDrawer}
+            open={false}
             PaperProps={{
                 sx: {
                     minWidth: 75,
                 }
             }}
-            onClose={handleCloseDrawer}
         >
             <Box component="div" px={2} pt={2} height={65} boxSizing='border-box'>
-                <Collapse 
-                    in={extendDrawer} 
+                <Collapse
                     timeout={300} 
                     orientation="horizontal"
                     collapsedSize={45}
@@ -52,24 +84,23 @@ const Navigator = () => {
             <Divider />
 
             <List>
-                <Tooltip title='Trang chủ' placement="right">
+                <Tooltip title='Tài khoản' placement="right">
                     <ListItem disablePadding sx={{ display: 'block' }}>
                         <ListItemButton
                             sx={{
                                 minHeight: 48,
-                                justifyContent: extendDrawer ? 'initial' : 'center',
                                 px: 2.5,
+                                justifyContent: 'center',
                             }}
                             onClick={() => navigator('/accounts')}
                         >
                             <ListItemIcon
                                 sx={{
                                     minWidth: 0,
-                                    mr: extendDrawer ? 3 : 0,
                                 }}
-                            ><ContactsIcon />
+                            >
+                                <ContactsIcon color={selectedIndex === 0 ? 'primary' : 'action'} />
                             </ListItemIcon>
-                            <ListItemText primary={'Tài khoản'} sx={{ display: extendDrawer ? 'block' : 'none' }} />
                         </ListItemButton>
                     </ListItem>
                 </Tooltip>
@@ -80,19 +111,18 @@ const Navigator = () => {
                         <ListItemButton
                             sx={{
                                 minHeight: 48,
-                                justifyContent: extendDrawer ? 'initial' : 'center',
                                 px: 2.5,
+                                justifyContent: 'center',
                             }}
                             onClick={() => navigator('/campaigns')}
                         >
                             <ListItemIcon
                                 sx={{
                                     minWidth: 0,
-                                    mr: extendDrawer ? 3 : 0,
                                 }}
-                            ><CampaignIcon />
+                            >
+                                <CampaignIcon color={selectedIndex === 1 ? 'primary' : 'action'} />
                             </ListItemIcon>
-                            <ListItemText primary={'Chiến dịch'} sx={{ display: extendDrawer ? 'block' : 'none' }} />
                         </ListItemButton>
                     </ListItem>
                 </Tooltip>
@@ -102,7 +132,7 @@ const Navigator = () => {
                 component="div"
                 sx={{
                     position: 'absolute',
-                    bottom: 0,
+                    bottom: 10,
                     left: 0,
                     right: 0,
                     display: 'flex',
@@ -115,7 +145,6 @@ const Navigator = () => {
                     <IconButton onClick={handleOpenMenu}>
                         <AccountCircle />
                     </IconButton>
-                    {extendDrawer && <Typography variant='caption'>Admin</Typography>}
                 </Box>
 
                 <Menu
@@ -128,14 +157,8 @@ const Navigator = () => {
                     open={Boolean(menuAnchorEl)} 
                     onClose={handleCloseMenu}
                 >
-                    <MenuItem onClick={() => navigator('/login')}>Đăng xuất</MenuItem>
+                    <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
                 </Menu>
-            
-                <Box>
-                    <IconButton onClick={handleToggleDrawer}>
-                        {extendDrawer ? <ChevronLeftRounded /> : <ChevronRightRounded />}
-                    </IconButton>
-                </Box>
             </Box>
         </Drawer>
     )

@@ -1,11 +1,22 @@
 import CampaignCard from "@components/card/campaignCard"
-import { Box, Tab, Tabs } from "@mui/material"
+import DateFilter from "@components/dateFilter/dateFilter"
+import useDateFilterController from "@components/dateFilter/useDateFilterController"
+import { ArrowDownward } from "@mui/icons-material"
+import { Box, Button, Tab, Tabs } from "@mui/material"
 import { SyntheticEvent, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+enum ECampaignTab {
+    ALL = 0,
+    RUNNING = 1,
+    ENDED = 2
+}
+
+
 const CampaignsPage = () => {
     const navigator = useNavigate()
-    const [tabIndex, setTabIndex] = useState(0)
+    const dateFilterController = useDateFilterController()
+    const [tabIndex, setTabIndex] = useState<ECampaignTab>(ECampaignTab.ALL)
 
     const onChangeTab = (_: SyntheticEvent, newValue: number) => {
         setTabIndex(newValue)
@@ -21,7 +32,7 @@ const CampaignsPage = () => {
                 sx={{
                     position: 'sticky',
                     top: 0,
-                    zIndex: 1,
+                    zIndex: 3,
                     backgroundColor: 'background.paper',
                     borderBottom: 1,
                     borderColor: 'divider',
@@ -31,6 +42,9 @@ const CampaignsPage = () => {
                 <Tab label="Đang chạy" />
                 <Tab label="Đã kết thúc" />
             </Tabs>
+
+            <DateFilter controller={dateFilterController}/>
+
             <Box 
                 sx={{ 
                     marginTop: 3,
@@ -48,7 +62,18 @@ const CampaignsPage = () => {
                 <CampaignCard />
                 <CampaignCard />
                 <CampaignCard />
-                <CampaignCard />
+            </Box>
+
+            <Box pt={3} sx={{ display: 'flex', justifyContent: 'center'}}>
+                <Button 
+                    variant="text"
+                    startIcon={<ArrowDownward />}
+                    sx={{ 
+                        color: 'primary.dark'
+                    }}
+                >
+                    Xem thêm
+                </Button>
             </Box>
         </>
 
