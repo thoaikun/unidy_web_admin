@@ -1,17 +1,29 @@
 import SplitButton from "@components/button/splitButton"
-import { useTheme } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, useTheme } from "@mui/material"
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
 import { Avatar, Box, Chip, CircularProgress, Divider, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material"
 import accountService from "@services/account"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
+import { useState } from "react"
 
 const OrganizationDetailScreen = () => {
     const theme = useTheme()
+    const queryClient = useQueryClient()
     const { id } = useParams()
+    const [isOpenDialog, setIsOpenDialog] = useState(false)
+
     const { data: organization, isLoading } = useQuery({
         queryKey: ['organization', id],
         queryFn: () => accountService.getOrganizationById(id ?? '0')
+    })
+    const approveOrganizationMutation = useMutation({
+        mutationFn: () => accountService.approveOrganization(id ?? '0'),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['organization']
+            })
+        }
     })
 
     if (isLoading) {
@@ -56,8 +68,7 @@ const OrganizationDetailScreen = () => {
                 <Box>
                     <SplitButton 
                         actions={[
-                            { label: 'Phê duyệt', onClick: () => {} },
-                            { label: 'Xóa', onClick: () => {} }
+                            { label: 'Phê duyệt', onClick: () => setIsOpenDialog(true), disabled: organization?.isApproved },
                         ]}
                     /> 
                 </Box>
@@ -110,6 +121,46 @@ const OrganizationDetailScreen = () => {
                     </Table>
                 </Box>
             </Box>
+
+            <Dialog
+                open={isOpenDialog}
+                onClose={() => setIsOpenDialog(false)}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const formJson = Object.fromEntries((formData).entries());
+                        const affirmation = formJson.affirmation;
+                        if (affirmation === 'Có') {
+                            approveOrganizationMutation.mutate()
+                        }
+                        setIsOpenDialog(false)
+                    }
+                }}
+            >
+                <DialogTitle>Phê duyệt tổ chức</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Bạn có chắc chắn muốn phê duyệt cho tổ chức này. Vui lòng nhập "Có" để xác nhận.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="affirmation"
+                        name="affirmation"
+                        label="Xác nhận"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button color="error" onClick={() => setIsOpenDialog(false)}>Hủy</Button>
+                    <Button color="info" type="submit">Xác nhận</Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }

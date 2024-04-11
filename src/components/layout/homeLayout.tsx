@@ -1,8 +1,15 @@
 import Navigator from "@components/navigator/navigator";
 import { Box } from "@mui/material";
-import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const HomeLayout = () => {
+    const navigator = useNavigate()
+
+    useEffect(() => {
+        navigator('/accounts')
+    }, [])
+
     return (
         <Box component="div" sx={{ display: 'flex', flexDirection: 'column'}}>
             <Navigator />

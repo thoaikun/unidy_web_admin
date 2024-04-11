@@ -40,12 +40,22 @@ const getOrganizationById = async (organizationId: string) => {
     return res.data as Organization
 }
 
+const approveOrganization = async (organizationId: string) => {
+    await api.patch(`api/v1/admin/organizations/${organizationId}/approve`)
+}
+
+const blockOrUnBlockVolunteer = async (volunteerId: string) => {
+    await api.patch(`api/v1/admin/users/${volunteerId}/block`)
+}
+
 const accountService = {
     getVolunteers,
     getVolunteerById,
     getOrganizations,
     getUnapprovedOrganizations,
-    getOrganizationById
+    getOrganizationById,
+    approveOrganization,
+    blockOrUnBlockVolunteer
 }
 
 export default accountService

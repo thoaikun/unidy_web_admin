@@ -1,17 +1,29 @@
 import SplitButton from '@components/button/splitButton';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import { Avatar, Box, Chip, CircularProgress, Divider, Table, TableBody, TableCell, TableRow, Typography, useTheme } from "@mui/material";
+import { Avatar, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Table, TableBody, TableCell, TableRow, TextField, Typography, useTheme } from "@mui/material";
 import accountService from '@services/account';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDateTime } from '@utils/index';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const VolunteerDetailPage = () => {
     const theme = useTheme()
     const { id } = useParams()
+    const queryClient = useQueryClient()
+    const [isOpenDialog, setIsOpenDialog] = useState(false)
+
     const { data: volunteer, isLoading } = useQuery({
         queryKey: ['volunteer', id],
         queryFn: () => accountService.getVolunteerById(id ?? '0')
+    })
+    const blockOrUnblockVolunteerMutation = useMutation({
+        mutationFn: () => accountService.blockOrUnBlockVolunteer(id ?? '0'),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['volunteer']
+            })
+        }
     })
 
     if (isLoading) {
@@ -55,8 +67,7 @@ const VolunteerDetailPage = () => {
                 <Box>
                     <SplitButton 
                         actions={[
-                            { label: 'Chặn', onClick: () => {} },
-                            { label: 'Xóa', onClick: () => {} }
+                            { label: !volunteer?.isBlock ? 'Chặn' : 'Bỏ chặn', onClick: () => setIsOpenDialog(true) },
                         ]}
                     /> 
                 </Box>
@@ -117,6 +128,46 @@ const VolunteerDetailPage = () => {
                     </Table>
                 </Box>
             </Box>
+
+            <Dialog
+                open={isOpenDialog}
+                onClose={() => setIsOpenDialog(false)}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const formJson = Object.fromEntries((formData).entries());
+                        const affirmation = formJson.affirmation;
+                        if (affirmation === 'Có') {
+                            blockOrUnblockVolunteerMutation.mutate()
+                        }
+                        setIsOpenDialog(false)
+                    }
+                }}
+            >
+                <DialogTitle>Phê duyệt tổ chức</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Bạn có chắc chắn muốn {volunteer?.isBlock ? 'bỏ chặn' : 'chặn'} người dùng này. Vui lòng nhập "Có" để xác nhận.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="affirmation"
+                        name="affirmation"
+                        label="Xác nhận"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button color="error" onClick={() => setIsOpenDialog(false)}>Hủy</Button>
+                    <Button color="info" type="submit">Xác nhận</Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }

@@ -11,6 +11,7 @@ import MenuList from '@mui/material/MenuList';
 
 interface IAction {
   label: string;
+  disabled?: boolean;
   onClick: () => void;
 }
 
@@ -22,10 +23,10 @@ interface IProps {
 export default function SplitButton({ actions }: IProps) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   const handleClick = () => {
-    console.info(`You clicked ${actions[selectedIndex].label}`);
+    actions[selectedIndex].onClick();
   };
 
   const handleMenuItemClick = (
@@ -57,7 +58,7 @@ export default function SplitButton({ actions }: IProps) {
         variant="contained"
         ref={anchorRef}
       >
-        <Button size="small" onClick={handleClick}>{actions[selectedIndex].label}</Button>
+        <Button disabled={actions[selectedIndex].disabled} size="small" onClick={handleClick}>{actions[selectedIndex].label}</Button>
         <Button
           size="small"
           aria-controls={open ? 'split-button-menu' : undefined}
@@ -93,6 +94,7 @@ export default function SplitButton({ actions }: IProps) {
                   {actions.map((option, index) => (
                     <MenuItem
                       key={option.label}
+                      disabled={option.disabled}
                       selected={index === selectedIndex}
                       onClick={(event) => handleMenuItemClick(event, index)}
                     >
