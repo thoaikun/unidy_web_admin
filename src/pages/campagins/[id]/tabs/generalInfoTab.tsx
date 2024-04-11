@@ -3,6 +3,7 @@ import { BusinessRounded, InfoRounded } from "@mui/icons-material"
 import { Avatar, Box, Chip, Divider, ImageList, ImageListItem, Stack, Table, TableBody, TableCell, TableRow, Typography, useTheme } from "@mui/material"
 import { formatDateTime } from "@utils/index"
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface IProps {
     campaign?: Campaign
@@ -11,6 +12,7 @@ interface IProps {
 
 const GeneralInfoTab = ({ campaign, organization } : IProps) => {
     const theme = useTheme()
+    const navigator = useNavigate()
     const [images, setImages] = useState<string[]>([])
 
     useEffect(() => {
@@ -131,7 +133,7 @@ const GeneralInfoTab = ({ campaign, organization } : IProps) => {
                     <TableBody>
                         <TableRow>
                             <TableCell width={200}>Tên tổ chức</TableCell>
-                            <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }} onClick={() => navigator(`/accounts/organizations/${organization?.userId}`)}>
                                 <Avatar 
                                     src={organization?.userProfileImage?.linkImage}
                                     sx={{ width: 30, height: 30, bgcolor: 'primary.main' }}

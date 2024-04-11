@@ -4,9 +4,10 @@ import postService from "@services/post"
 import { useQuery } from "@tanstack/react-query"
 import { formatDateTime } from "@utils/index"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 const PostDetailPage = () => {
+    const navigator = useNavigate()
     const theme = useTheme()
     const { id } = useParams()
     const [images, setImages] = useState<string[]>([])
@@ -78,13 +79,11 @@ const PostDetailPage = () => {
                     </TableRow>
                     <TableRow>
                         <TableCell width={200}>Người đăng</TableCell>
-                        <TableCell>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} >
-                                <Avatar>
-                                    {post?.user.fullName[0]}
-                                </Avatar>
-                                <Typography variant="body2">{post?.user.fullName}</Typography>
-                            </Box>
+                        <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigator(`/accounts/volunteers/${post?.user.userId}`)}>
+                            <Avatar sx={{ width: 32, height: 32}}>
+                                {post?.user.fullName[0]}
+                            </Avatar>
+                            <Typography variant="body2">{post?.user.fullName}</Typography>
                         </TableCell>
                     </TableRow>
                 </Table>
