@@ -1,4 +1,5 @@
 import { AccountCircle } from "@mui/icons-material";
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import { Box, Collapse, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
@@ -24,7 +25,7 @@ const Navigator = () => {
                 }
             }}
         >
-            <Box component="div" px={2} pt={2} height={65} boxSizing='border-box'>
+            <Box component="div" px={2} pt={2} height={65} boxSizing='border-box' sx={{ cursor: 'pointer' }} onClick={() => navigator('/accounts')}>
                 <Collapse
                     timeout={300} 
                     orientation="horizontal"
@@ -75,6 +76,27 @@ const Navigator = () => {
                                 }}
                             >
                                 <CampaignIcon color={selectedIndex === 1 ? 'primary' : 'action'} />
+                            </ListItemIcon>
+                        </ListItemButton>
+                    </ListItem>
+                </Tooltip>
+
+                <Tooltip title='Bài đăng' placement="right">
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                            sx={{
+                                minHeight: 48,
+                                px: 2.5,
+                                justifyContent: 'center',
+                            }}
+                            onClick={() => navigator('/posts')}
+                        >
+                            <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                }}
+                            >
+                                <AutoStoriesIcon color={selectedIndex === 2 ? 'primary' : 'action'} />
                             </ListItemIcon>
                         </ListItemButton>
                     </ListItem>

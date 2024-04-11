@@ -1,20 +1,20 @@
-import { Campaign } from "@models/campaign"
-import { Card, CardHeader, Avatar, CardMedia, CardContent, Typography, CardActionArea } from "@mui/material"
+import { Post } from "@models/post"
+import { Avatar, Card, CardActionArea, CardContent, CardHeader, CardMedia, Typography } from "@mui/material"
 import { formatDateTime } from "@utils/index"
 import { useEffect, useState } from "react"
 
 interface IProps {
-    campaign: Campaign
+    post: Post
     onClick?: () => void
 }
 
-const CampaignCard = ({ campaign, onClick } : IProps) => {
+const PostCard = ({ post, onClick }: IProps) => {
     const [images, setImages] = useState<string[]>([])
 
     useEffect(() => {
-        const images = JSON.parse(campaign.link_image)
+        const images = JSON.parse(post.linkImage)
         setImages(images)
-    }, [campaign])
+    }, [post])
 
     return (
         <Card
@@ -32,18 +32,17 @@ const CampaignCard = ({ campaign, onClick } : IProps) => {
                     avatar={
                         <Avatar 
                             sx={{ bgcolor: 'primary.main', width: 30, height: 30 }}
-                            src={campaign?.organization?.userProfileImage?.linkImage}
                         >
-                            {campaign?.organization?.organizationName[0]}
+                            {post.user.fullName[0]}
                         </Avatar>
                     }
-                    title={campaign?.title}
-                    subheader={formatDateTime(campaign?.createDate)}
+                    title={post.user.fullName}
+                    subheader={formatDateTime(post.createDate)}
                 />
                 <CardMedia 
                     component="img"
                     height={140}
-                    image={images && images?.length > 0 ? images[0] : 'https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg'}
+                    image={images && images.length > 0 ? images[0] : 'https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg'}
                     alt="campaign-image"
                 />
                 <CardContent>
@@ -53,7 +52,7 @@ const CampaignCard = ({ campaign, onClick } : IProps) => {
                         paragraph
                         noWrap
                     >
-                        {campaign?.description}
+                        {post.content}
                     </Typography>
                 </CardContent>
             </CardActionArea>
@@ -61,4 +60,4 @@ const CampaignCard = ({ campaign, onClick } : IProps) => {
     )
 }
 
-export default CampaignCard
+export default PostCard

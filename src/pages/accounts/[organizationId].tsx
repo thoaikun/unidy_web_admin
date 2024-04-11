@@ -56,7 +56,7 @@ const OrganizationDetailScreen = () => {
                 <Box>
                     <SplitButton 
                         actions={[
-                            { label: 'Chặn', onClick: () => {} },
+                            { label: 'Phê duyệt', onClick: () => {} },
                             { label: 'Xóa', onClick: () => {} }
                         ]}
                     /> 

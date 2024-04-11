@@ -23,11 +23,23 @@ const useCampaigns = () => {
     const [tabIndex, setTabIndex] = useState<ECampaignTab>(ECampaignTab.ALL)
 
     useEffect(() => {
-        const params = new URLSearchParams(searchParams)
-        params.set('page', page.toString())
-        params.set('tabIndex', tabIndex.toString())
-        setSearchParams(params)
-    },[page, tabIndex]) // eslint-disable-line
+        const tab = searchParams.get('tabIndex')
+        const page = searchParams.get('page')
+        if (!tab || !page) {
+            const params = new URLSearchParams(searchParams)
+            params.set('tabIndex', ECampaignTab.ALL.toString())
+            params.set('page', '1')
+            setSearchParams(params)
+            return
+        }
+        setTabIndex(parseInt(tab))
+        setPage(parseInt(page))
+    },[]) // eslint-disable-line
+
+    useEffect(() => {
+        setPage(parseInt(searchParams.get('page') ?? '1'))
+        setTabIndex(parseInt(searchParams.get('tabIndex') ?? '0'))
+    }, [searchParams])
 
     const { data, isLoading } = useQuery({
         queryKey: ['campaigns', page, tabIndex, dateFilterController.fromDate, dateFilterController.toDate],
@@ -118,7 +130,8 @@ const CampaignsPage = () => {
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
-                            marginTop: 3
+                            alignItems: 'center',
+                            height: 400
                         }} 
                     >
                         <CircularProgress size={32} />
@@ -126,7 +139,7 @@ const CampaignsPage = () => {
                 )
             }
 
-            {campaigns && campaigns.length > 0 ?
+            {!isLoading && campaigns && campaigns.length > 0 &&
                 (
                     <>
                         <Box 
@@ -157,7 +170,9 @@ const CampaignsPage = () => {
                         </Box>
                     </>
                 )  
-                :
+            }
+            {
+                !isLoading && (!campaigns || campaigns?.length === 0) &&
                 (
                     <EmptyPlaceholder />
                 )  

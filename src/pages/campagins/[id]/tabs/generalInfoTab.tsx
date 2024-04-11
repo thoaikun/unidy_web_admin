@@ -1,7 +1,8 @@
 import { Campaign, ECampaignStatus, OrganizationInfo } from "@models/campaign"
 import { BusinessRounded, InfoRounded } from "@mui/icons-material"
-import { Avatar, Box, Chip, Divider, Stack, Table, TableBody, TableCell, TableRow, Typography, useTheme } from "@mui/material"
+import { Avatar, Box, Chip, Divider, ImageList, ImageListItem, Stack, Table, TableBody, TableCell, TableRow, Typography, useTheme } from "@mui/material"
 import { formatDateTime } from "@utils/index"
+import { useState, useEffect } from "react"
 
 interface IProps {
     campaign?: Campaign
@@ -10,6 +11,12 @@ interface IProps {
 
 const GeneralInfoTab = ({ campaign, organization } : IProps) => {
     const theme = useTheme()
+    const [images, setImages] = useState<string[]>([])
+
+    useEffect(() => {
+        const images = JSON.parse(campaign?.link_image ?? '[]')
+        setImages(images)
+    }, [campaign])
 
     const CampaignTypeChip = () => {
         const campaignType = campaign?.campaignType
@@ -45,7 +52,7 @@ const GeneralInfoTab = ({ campaign, organization } : IProps) => {
                 <Divider textAlign="left">
                     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 1, color: theme.palette.text.secondary }}>
                         <InfoRounded sx={{ width: 20, height: 20 }} />
-                        <Typography variant="body1">Campaign information</Typography>
+                        <Typography variant="body1">Thông tin chiến dịch</Typography>
                     </Box>
                 </Divider>
                 
@@ -91,6 +98,22 @@ const GeneralInfoTab = ({ campaign, organization } : IProps) => {
                         <TableRow>
                             <TableCell width={200}>Cập nhật cuối</TableCell>
                             <TableCell>{formatDateTime(campaign?.updateDate || campaign?.createDate)}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell width={200}>Ảnh</TableCell>
+                            <TableCell>
+                                {images && images.length === 0 ? 
+                                    'Chưa cập nhật'
+                                    :
+                                    <ImageList sx={{ width: 500 }}>
+                                        {images.map((image, index) => (
+                                            <ImageListItem key={index}>
+                                                <img src={image} alt={`image-${index}`} loading="lazy"/>
+                                            </ImageListItem>
+                                        ))}
+                                    </ImageList>
+                                }
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>

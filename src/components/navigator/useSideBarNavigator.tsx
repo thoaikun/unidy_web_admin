@@ -27,6 +27,8 @@ const useSideBarNavigator = () => {
             setSelectedIndex(0)
         else if (location.pathname.includes('/campaigns'))
             setSelectedIndex(1)
+        else if (location.pathname.includes('/posts'))
+            setSelectedIndex(2)
     }, [location.pathname])
 
     return {

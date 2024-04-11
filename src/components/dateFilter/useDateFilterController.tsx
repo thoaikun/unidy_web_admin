@@ -86,6 +86,22 @@ const useDateFilterController = () : IUseDateFilterController => {
         }
     }, [searchParams])
 
+    useEffect(() => {
+        const f = searchParams.get('fromDate')
+        const t = searchParams.get('toDate')
+        if (f && t) {
+            setFromDate(moment(f))
+            setToDate(moment(t))
+            return
+        }
+        else if (fromDate && toDate) {
+            const params = new URLSearchParams(searchParams)
+            params.set('fromDate', moment(new Date()).subtract(7, 'days').format('YYYY-MM-DD'))
+            params.set('toDate', moment(new Date()).format('YYYY-MM-DD'))
+            setSearchParams(params)
+        }
+    }, [])
+
     return {
         fromDate,
         toDate,
