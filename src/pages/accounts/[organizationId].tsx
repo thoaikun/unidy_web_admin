@@ -1,9 +1,34 @@
-import SplitButton from '@components/button/splitButton';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import { Avatar, Box, Chip, Divider, Table, TableBody, TableCell, TableRow, Typography, useTheme } from "@mui/material";
+import SplitButton from "@components/button/splitButton"
+import { useTheme } from "@mui/material"
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
+import { Avatar, Box, Chip, CircularProgress, Divider, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material"
+import accountService from "@services/account"
+import { useQuery } from "@tanstack/react-query"
+import { useParams } from "react-router-dom"
 
-const AccountDetailPage = () => {
+const OrganizationDetailScreen = () => {
     const theme = useTheme()
+    const { id } = useParams()
+    const { data: organization, isLoading } = useQuery({
+        queryKey: ['organization', id],
+        queryFn: () => accountService.getOrganizationById(id ?? '0')
+    })
+
+    if (isLoading) {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 300,
+                }}
+            >
+                <CircularProgress size={32} />
+            </Box>
+        )
+    }
+
 
     return (
         <>
@@ -17,12 +42,15 @@ const AccountDetailPage = () => {
                         marginTop: 2
                     }}
                 >
-                    <Avatar sx={{ width: 50, height: 50}}>
-                        A
+                    <Avatar 
+                        sx={{ width: 50, height: 50}}
+                        src={organization?.image}
+                    >
+                        {organization?.organizationName[0]}
                     </Avatar>
                     <Box>
-                        <Typography variant="h6">Tên tài khoản</Typography>
-                        <Typography variant="body1">Email</Typography>
+                        <Typography variant="h6">{organization?.organizationName}</Typography>
+                        <Typography variant="body1">{organization?.email}</Typography>
                     </Box>
                 </Box>
                 <Box>
@@ -39,7 +67,7 @@ const AccountDetailPage = () => {
                 <Divider textAlign="left" sx={{ marginBottom: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 1, color: theme.palette.text.secondary }}>
                         <AssignmentIndIcon sx={{ width: 20, height: 20 }} />
-                        <Typography variant="body1">User information</Typography>
+                        <Typography variant="body1">Thông tin cá nhân</Typography>
                     </Box>
                 </Divider>
                 <Box>
@@ -47,38 +75,34 @@ const AccountDetailPage = () => {
                         <TableBody>
                             <TableRow>
                                 <TableCell width={200}>Tên</TableCell>
-                                <TableCell>Nguyễn Văn A</TableCell>
+                                <TableCell>{organization?.organizationName}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell width={200}>Email</TableCell>
                                 <TableCell>
-
+                                    {organization?.email}
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell width={200}>Số điện thoại</TableCell>
-                                <TableCell>0123456789</TableCell>
+                                <TableCell>{organization?.phone}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell width={200}>Địa chỉ</TableCell>
-                                <TableCell>123 Đường ABC, Quận 1, TP.HCM</TableCell>
+                                <TableCell>{organization?.address}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell width={200}>Ngày sinh</TableCell>
-                                <TableCell>20/02/2002</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell width={200}>Giới tính</TableCell>
-                                <TableCell>Nam</TableCell>
+                                <TableCell width={200}>Quốc gia</TableCell>
+                                <TableCell>{organization?.country}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell width={200}>Loại tài khoản</TableCell>
-                                <TableCell>Volunteer</TableCell>
+                                <TableCell>Organization</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell width={200}>Trạng thái</TableCell>
                                 <TableCell>
-                                    <Chip label="Active" color='success' />
+                                    <Chip label={organization?.isApproved ? 'Approved' : 'Not approved' } color={organization?.isApproved ? 'success' : 'info'} />
                                 </TableCell>
                             </TableRow>
 
@@ -90,4 +114,4 @@ const AccountDetailPage = () => {
     )
 }
 
-export default AccountDetailPage;
+export default OrganizationDetailScreen

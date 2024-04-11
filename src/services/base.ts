@@ -2,7 +2,7 @@ import { Session } from "@models/session";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://unidy-api.hungnhb.dev",
+  baseURL: "http://localhost:8080",
 });
 
 api.interceptors.request.use((config) => {

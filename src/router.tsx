@@ -1,6 +1,7 @@
 import HomeLayout from "@components/layout/homeLayout";
 import AccountsPage from "@pages/accounts";
-import AccountDetailPage from "@pages/accounts/[id]";
+import OrganizationDetailScreen from "@pages/accounts/[organizationId]";
+import VolunteerDetailPage from "@pages/accounts/[volunteerId]";
 import CampaignsPage from "@pages/campagins";
 import CampaignDetailPage from "@pages/campagins/[id]";
 import LoginPage from "@pages/login";
@@ -29,8 +30,12 @@ const router = createBrowserRouter([
             element: <AccountsPage />
           },
           {
-            path: '/accounts/:id',
-            element: <AccountDetailPage />
+            path: '/accounts/volunteers/:id',
+            element: <VolunteerDetailPage />
+          },
+          {
+            path: '/accounts/organizations/:id',
+            element: <OrganizationDetailScreen />
           }
         ]
     }

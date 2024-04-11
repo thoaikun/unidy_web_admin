@@ -2,54 +2,7 @@ import { AccountCircle } from "@mui/icons-material";
 import CampaignIcon from '@mui/icons-material/Campaign';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import { Box, Collapse, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
-import api from "@services/base";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
-
-const useSideBarNavigator = () => {
-    const navigator = useNavigate()
-    const location = useLocation()
-    const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-    const [selectedIndex, setSelectedIndex] = useState(0)
-
-    const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setMenuAnchorEl(event.currentTarget);
-    };
-    
-    const handleCloseMenu = () => {
-        setMenuAnchorEl(null);
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('session')
-        delete api.defaults.headers.common['Authorization']
-        navigator('/login')
-    }
-
-    useEffect(() => {
-        switch (location.pathname) {
-            case '/accounts':
-                setSelectedIndex(0)
-                break
-            case '/campaigns':
-                setSelectedIndex(1)
-                break
-            default:
-                setSelectedIndex(0)
-                break
-        }
-    }, [location.pathname])
-
-    return {
-        menuAnchorEl,
-        selectedIndex,
-        handleOpenMenu,
-        handleCloseMenu,
-        handleLogout,
-        navigator,
-    }
-}
+import useSideBarNavigator from "./useSideBarNavigator";
 
 const Navigator = () => {
     const {

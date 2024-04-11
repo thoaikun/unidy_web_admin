@@ -1,6 +1,7 @@
 import { SelectChangeEvent } from "@mui/material"
 import moment from "moment"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 
 export enum EQuickDateSelection {
     THIS_WEEK = 1,
@@ -18,6 +19,7 @@ export interface IUseDateFilterController {
 }
 
 const useDateFilterController = () : IUseDateFilterController => {
+    const [searchParams, setSearchParams] = useSearchParams()
     const [fromDate, setFromDate] = useState(moment(new Date()).subtract(7, 'days'))
     const [toDate, setToDate] = useState(moment(new Date()))
     const [quickSelection, setQuickSelection] = useState<EQuickDateSelection | null>(null)
@@ -26,25 +28,41 @@ const useDateFilterController = () : IUseDateFilterController => {
         const value = event.target.value as EQuickDateSelection
         setQuickSelection(value)
         
-        switch (value) {
-            case EQuickDateSelection.THIS_WEEK:
-                setFromDate(moment(new Date()).startOf('week'))
-                setToDate(moment(new Date()))
-                break
-            case EQuickDateSelection.THIS_MONTH:
-                setFromDate(moment(new Date()).startOf('month'))
-                setToDate(moment(new Date()))
-                break
-            case EQuickDateSelection.LAST_MONTH:
-                setFromDate(moment(new Date()).subtract(1, 'month').startOf('month'))
-                setToDate(moment(new Date()).subtract(1, 'month').endOf('month'))
-                break
+        if (value === EQuickDateSelection.THIS_WEEK) {
+            setFromDate(moment(new Date()).startOf('week'))
+            setToDate(moment(new Date()))
+            const params = new URLSearchParams(searchParams)
+            params.set('fromDate', fromDate.format('YYYY-MM-DD'))
+            params.set('toDate', toDate.format('YYYY-MM-DD'))
+            setSearchParams(params)
+            return
+        }
+        else if (value === EQuickDateSelection.THIS_MONTH) {
+            setFromDate(moment(new Date()).startOf('month'))
+            setToDate(moment(new Date()))
+            const params = new URLSearchParams(searchParams)
+            params.set('fromDate', fromDate.format('YYYY-MM-DD'))
+            params.set('toDate', toDate.format('YYYY-MM-DD'))
+            setSearchParams(params)
+            return
+        }
+        else if (value === EQuickDateSelection.LAST_MONTH) {
+            setFromDate(moment(new Date()).subtract(1, 'month').startOf('month'))
+            setToDate(moment(new Date()).subtract(1, 'month').endOf('month'))
+            const params = new URLSearchParams(searchParams)
+            params.set('fromDate', fromDate.format('YYYY-MM-DD'))
+            params.set('toDate', toDate.format('YYYY-MM-DD'))
+            setSearchParams(params)
+            return
         }
     }
 
     const handleFromDateChange = (date: moment.Moment | null) => {
         if (date) {
             setFromDate(date)
+            const params = new URLSearchParams(searchParams)
+            params.set('fromDate', date.format('YYYY-MM-DD'))
+            setSearchParams(params)
         }
         setQuickSelection(null)
     }
@@ -52,10 +70,21 @@ const useDateFilterController = () : IUseDateFilterController => {
     const handleToDateChange = (date: moment.Moment | null) => {
         if (date) {
             setToDate(date)
+            const params = new URLSearchParams(searchParams)
+            params.set('toDate', date.format('YYYY-MM-DD'))
+            setSearchParams(params)
         }
         setQuickSelection(null)
     }
 
+    useEffect(() => {
+        const fromDate = searchParams.get('fromDate')
+        const toDate = searchParams.get('toDate')
+        if (fromDate && toDate) {
+            setFromDate(moment(fromDate))
+            setToDate(moment(toDate))
+        }
+    }, [searchParams])
 
     return {
         fromDate,

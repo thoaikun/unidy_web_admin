@@ -1,10 +1,20 @@
+import { Campaign } from "@models/campaign"
 import { Card, CardHeader, Avatar, CardMedia, CardContent, Typography, CardActionArea } from "@mui/material"
+import { useEffect, useState } from "react"
 
 interface IProps {
+    campaign: Campaign
     onClick?: () => void
 }
 
-const CampaignCard = ({ onClick } : IProps) => {
+const CampaignCard = ({ campaign, onClick } : IProps) => {
+    const [images, setImages] = useState<string[]>([])
+
+    useEffect(() => {
+        const images = JSON.parse(campaign.link_image)
+        setImages(images)
+    }, [campaign])
+
     return (
         <Card
             sx={{
@@ -19,22 +29,30 @@ const CampaignCard = ({ onClick } : IProps) => {
             >
                 <CardHeader 
                     avatar={
-                        <Avatar sx={{ bgcolor: 'primary.main', width: 30, height: 30 }}>
-                            A
+                        <Avatar 
+                            sx={{ bgcolor: 'primary.main', width: 30, height: 30 }}
+                            src={campaign?.organization?.userProfileImage?.linkImage}
+                        >
+                            {campaign?.organization?.organizationName[0]}
                         </Avatar>
                     }
-                    title="Campaign title"
-                    subheader="September 14, 2016"
+                    title={campaign?.title}
+                    subheader={campaign?.createDate?.toString()}
                 />
                 <CardMedia 
                     component="img"
                     height={140}
-                    image="https://images.pexels.com/photos/933624/pexels-photo-933624.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                    image={images && images?.length > 0 ? images[0] : 'https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg'}
                     alt="campaign-image"
                 />
                 <CardContent>
-                    <Typography variant="body2" color='text.secondary'>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi, quae.
+                    <Typography 
+                        variant="body2" 
+                        color='text.secondary' 
+                        paragraph
+                        noWrap
+                    >
+                        {campaign?.description}
                     </Typography>
                 </CardContent>
             </CardActionArea>

@@ -1,9 +1,43 @@
-import { InfoRounded, BusinessRounded } from "@mui/icons-material"
+import { Campaign, ECampaignStatus, OrganizationInfo } from "@models/campaign"
+import { BusinessRounded, InfoRounded } from "@mui/icons-material"
 import { Avatar, Box, Chip, Divider, Stack, Table, TableBody, TableCell, TableRow, Typography, useTheme } from "@mui/material"
-import { getRandomColor } from "@utils/index"
+import { formatDateTime } from "@utils/index"
 
-const GeneralInfoTab = () => {
+interface IProps {
+    campaign?: Campaign
+    organization?: OrganizationInfo
+}
+
+const GeneralInfoTab = ({ campaign, organization } : IProps) => {
     const theme = useTheme()
+
+    const CampaignTypeChip = () => {
+        const campaignType = campaign?.campaignType
+        const campaignTypeList = [
+            { name: 'Cộng đồng', value: campaignType?.communityType ?? 0 },
+            { name: 'Giáo dục', value: campaignType?.education ?? 0 },
+            { name: 'Nghiên cứu', value: campaignType?.research ?? 0 },
+            { name: 'Hỗ trợ khác', value: campaignType?.helpOther ?? 0 },
+            { name: 'Môi trường', value: campaignType?.environment ?? 0 },
+            { name: 'Sức khỏe', value: campaignType?.healthy ?? 0 },
+            { name: 'Phòng chống thiên tai', value: campaignType?.emergencyPreparedness ?? 0 },
+        ]
+
+        const chips = []
+
+        for (let i = 0; i < campaignTypeList.length; i++) {
+            if (campaignTypeList[i].value > 0) {
+                chips.push(
+                    <Chip
+                        key={i}
+                        label={campaignTypeList[i].name}
+                    />
+                )
+            }
+        }
+
+        return chips
+    }
 
     return (
         <>
@@ -19,41 +53,44 @@ const GeneralInfoTab = () => {
                     <TableBody>
                         <TableRow>
                             <TableCell width={200}>Mô tả</TableCell>
-                            <TableCell>Thêm thông tin mô tả sẽ nằm ở vị trí như thế này</TableCell>
+                            <TableCell>{campaign?.description}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell width={200}>Trạng thái</TableCell>
-                            <TableCell>Thêm thông tin mô tả sẽ nằm ở vị trí như thế này</TableCell>
+                            <TableCell>
+                                <Chip 
+                                    label={campaign?.status}
+                                    color={campaign?.status === ECampaignStatus.COMPLETE ? 'success' : campaign?.status === ECampaignStatus.BLOCK ? 'error' : 'info'}
+                                />
+                            </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell width={200}>Thời gian mở</TableCell>
-                            <TableCell>Thêm thông tin mô tả sẽ nằm ở vị trí như thế này</TableCell>
+                            <TableCell>{formatDateTime(campaign?.startDate)}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell width={200}>Thời gian đóng</TableCell>
-                            <TableCell>Thêm thông tin mô tả sẽ nằm ở vị trí như thế này</TableCell>
+                            <TableCell>{formatDateTime(campaign?.endDate)}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell width={200}>Địa điểm diễn ra</TableCell>
-                            <TableCell>Thêm thông tin mô tả sẽ nằm ở vị trí như thế này</TableCell>
+                            <TableCell>{campaign?.location}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell width={200}>Thời gian diễn ra</TableCell>
-                            <TableCell>Thêm thông tin mô tả sẽ nằm ở vị trí như thế này</TableCell>
+                            <TableCell>{formatDateTime(campaign?.timeTakePlace)}</TableCell>
                         </TableRow>
                         <TableRow sx={{ borderBottom: 'none' }}>
                             <TableCell width={200}>Danh mục</TableCell>
                             <TableCell>
                                 <Stack direction="row" spacing={1}>
-                                    <Chip label="Danh mục 1" sx={{ backgroundColor: getRandomColor() }}/>
-                                    <Chip label="Danh mục 2" sx={{ backgroundColor: getRandomColor() }} />
-                                    <Chip label="Danh mục 3" sx={{ backgroundColor: getRandomColor() }} />
+                                    {CampaignTypeChip()}
                                 </Stack>
                             </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell width={200}>Cập nhật cuối</TableCell>
-                            <TableCell>20/02/2002</TableCell> 
+                            <TableCell>{formatDateTime(campaign?.updateDate || campaign?.createDate)}</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -72,17 +109,22 @@ const GeneralInfoTab = () => {
                         <TableRow>
                             <TableCell width={200}>Tên tổ chức</TableCell>
                             <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main' }}>A</Avatar>
-                                Green planet
+                                <Avatar 
+                                    src={organization?.userProfileImage?.linkImage}
+                                    sx={{ width: 30, height: 30, bgcolor: 'primary.main' }}
+                                >
+                                    {organization?.organizationName[0] || 'O'}
+                                </Avatar>
+                                {organization?.organizationName || 'Chưa cập nhật'}
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell width={200}>Email</TableCell>
-                            <TableCell></TableCell>
+                            <TableCell width={200}>Địa chỉ</TableCell>
+                            <TableCell>{organization?.address || 'Chưa cập nhật'}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell width={200}>Số điện thoại</TableCell>
-                            <TableCell></TableCell>
+                            <TableCell width={200}>Email</TableCell>
+                            <TableCell>{organization?.email || 'Chưa cập nhật'}</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
